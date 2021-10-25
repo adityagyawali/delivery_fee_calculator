@@ -10,13 +10,14 @@ const FeeCalculator = () => {
     e.preventDefault()
     if(cartValue >= 100) return 0
     const totalDeliveryFee = surchargeBasedOnCartValue(cartValue) +  getDeliveryFeeForDistanceTraveled + surchargeBasedOnTotalItems(totalItems)
-    console.log({totalDeliveryFee})
     if(totalDeliveryFee >= 15) return 15
     return totalDeliveryFee
   }
 
+  // surcharge to be added in the delivery fee if the cart value is less than 10
   const surchargeBasedOnCartValue = (cartValue: number) => cartValue < 10 ? 10 - cartValue : 0
 
+  // check if the date and time is in friday between 15 and 19
   const isFridayRushHour = (dateAndTime: string): boolean => {
     const isFriday = moment(dateAndTime).utc().day() === 5
     var currentTime = moment(dateAndTime).utc();
@@ -31,14 +32,19 @@ const FeeCalculator = () => {
 
 
   const deliveryFeeOnNormalDays = (distance: number) => {
-    if(distance < 1000) return 2
+    // upto 1000 meters fee is 2
+    if(distance <= 1000) return 2
+    // get total number of 500 meters from the total distance
     const noOfFiveHunderdMeters = distance / 500
+    // get the ceil value if the noOfFiveHunderdMeters has reminder
     return   noOfFiveHunderdMeters % 1 === 0 ? noOfFiveHunderdMeters * 1 : Math.ceil(noOfFiveHunderdMeters * 1)
   }
+
 
   const deliveryFeesOnFridayRushHour = (distance: number) =>    deliveryFeeOnNormalDays(distance) * 1.1
 
   const getDeliveryFeeForDistanceTraveled = isFridayRushHour(dateTime) ? deliveryFeesOnFridayRushHour(deliveryDistance)  : deliveryFeeOnNormalDays(deliveryDistance)
+
 
   const surchargeBasedOnTotalItems = (totalItem: number) => {
     if(totalItem <= 4) return 0
