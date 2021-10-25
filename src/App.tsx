@@ -1,4 +1,5 @@
 import React from 'react';
+import FeeCalculator from './components/FeeCalculator';
 
 function App() {
   return (
@@ -6,6 +7,7 @@ function App() {
       <header className="App-header">
         Delivery fee calculator
       </header>
+      <FeeCalculator />
     </div>
   );
 }
