@@ -1,10 +1,11 @@
+import moment from 'moment'
 import React, { useState } from 'react'
 
 const FeeCalculator = () => {
   const [cartValue, setCartValue] = useState<number>(0)
   const [deliveryDistance, setDeliveryDistance] = useState<number>(0)
   const [totalItems, setTotalItems] = useState<number>(0)
-  const [time, setTime] = useState<string>('0')
+  const [dateTime, setDateTime] = useState<string>('')
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault()
     if(cartValue >= 100) return 0
@@ -16,7 +17,17 @@ const FeeCalculator = () => {
 
   const surchargeBasedOnCartValue = (cartValue: number) => cartValue < 10 ? 10 - cartValue : 0
 
-  const isFridayRushHour = (dateAndTime: Date): boolean => false
+  const isFridayRushHour = (dateAndTime: string): boolean => {
+    const isFriday = moment(dateAndTime).utc().day() === 5
+    var currentTime = moment(dateAndTime).utc();
+
+    var extra = moment(dateAndTime).utc().format('YYYY-MM-DD') + ' ';
+    var start_time = moment(extra + '15:00').utc();
+    var end_time = moment(extra + '19:00').utc();
+    const isTimeBetweenThreeAndSeven = moment(currentTime).isBetween(start_time, end_time)
+    console.log({isFriday, start_time, isTimeBetweenThreeAndSeven, currentTime})
+    return isFriday && isTimeBetweenThreeAndSeven ? true : false
+  }
 
 
   const deliveryFeeOnNormalDays = (distance: number) => {
@@ -27,7 +38,7 @@ const FeeCalculator = () => {
 
   const deliveryFeesOnFridayRushHour = (distance: number) =>    deliveryFeeOnNormalDays(distance) * 1.1
 
-  const getDeliveryFeeForDistanceTraveled = isFridayRushHour(new Date()) ? deliveryFeesOnFridayRushHour(deliveryDistance)  : deliveryFeeOnNormalDays(deliveryDistance)
+  const getDeliveryFeeForDistanceTraveled = isFridayRushHour(dateTime) ? deliveryFeesOnFridayRushHour(deliveryDistance)  : deliveryFeeOnNormalDays(deliveryDistance)
 
   const surchargeBasedOnTotalItems = (totalItem: number) => {
     if(totalItem <= 4) return 0
@@ -44,7 +55,7 @@ const FeeCalculator = () => {
       <label>Total items</label>
       <input type="number" name="totalItems" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTotalItems(Number(e.target.value))}/>
       <label>Time</label>
-      <input type="datetime-local" name="time" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTime((e.target.value))}/>
+      <input type="datetime-local" name="dateTime" onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDateTime((e.target.value))}/>
       <button>Calculate</button>
     </form>
   )
